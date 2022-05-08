@@ -29,7 +29,7 @@ knitr::include_graphics(here::here("data/citibike IMG_6903.webp"))
 
 <br>
 
-### Domain knowledge (1.1)
+### Domain knowledge
 
 <br>
 
@@ -39,7 +39,7 @@ The data we are using is a sample including the usage of 10 bikes throughout 201
 
 <br>
 
-### Business requirements (1.2)
+### Business requirements
 
 <br>
 
@@ -54,7 +54,7 @@ I plan to take the following steps to complete this report:
 
 <br>
 
-### Business processes and data flow (1.3)
+### Business processes and data flow
 
 <br>
 
@@ -64,7 +64,7 @@ knitr::include_graphics(here::here("data/nyc_bikes data flow.png"))
 
 <br>
 
-### Data visualisation as a tool for decision-making (1.4)
+### Data visualisation as a tool for decision-making
 
 <br>
 
@@ -72,7 +72,7 @@ Through the use of analysis and key data visualisations, this report will help N
 
 <br>
 
-### Data types (1.5)
+### Data types
 
 <br>
 
@@ -81,7 +81,7 @@ Columns of the following variable types are added through cleaning and wrangling
 
 <br>
 
-### Data quality and data bias (1.6)
+### Data quality and data bias
 
 <br>
 
@@ -111,7 +111,7 @@ knitr::include_graphics(here::here("data/citibike Low_Res_191105_LYFT_CITIBIKE_4
 
 <br>
 
-### Preparing data for visualisation (1.7)
+### Preparing data for visualisation
 
 <br>
 
@@ -174,7 +174,7 @@ knitr::include_graphics(here::here("data/citibike save-money.webp"))
 
 <br>
 
-### Process and design (2.1, 2.7, 2.8, 2.9)
+### Process and design
 
 <br>
 
@@ -182,7 +182,7 @@ To begin with I looked at the cleaned dataset in the RStudio viewing window and 
 
 <br>
 
-### Visualisations (2.2, 2.3, 2.4, 2.5, 2.6)
+### Visualisations
 
 <br>
 
@@ -505,6 +505,6 @@ My last recommendation would be to use the map visualisation to determine which 
 
 Thank you for reading!
 
-```{r, echo=FALSE, fig.align = 'right', out.width = '25%'}
+```{r, echo=FALSE, fig.align = 'center', out.width = '30%'}
 knitr::include_graphics(here::here("data/Citi_Bike_logo.jpeg"))
 ```
