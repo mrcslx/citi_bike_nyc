@@ -68,7 +68,7 @@ knitr::include_graphics(here::here("data/nyc_bikes data flow.png"))
 
 <br>
 
-Through the use of analysis and key data visualisations, this report will help NYC Citi Bike decide on potential new marketing strategies as well as infrastructure changes and future expansion.
+Through the use of analysis and key data visualisations, this report will help Citi Bike NYC decide on potential new marketing strategies as well as infrastructure changes and future expansion.
 
 <br>
 
