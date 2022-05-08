@@ -1,0 +1,510 @@
+---
+title: "Citi Bike NYC"
+author: "Marcus Eilertsen"
+date: "18/04/2022"
+output:
+  html_document:
+    theme: united
+    toc: yes
+    toc_float: yes
+---
+
+<br>
+
+<br>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r figurename, echo=FALSE, out.width = '100%'}
+knitr::include_graphics(here::here("data/citibike IMG_6903.webp"))
+```
+
+<br>
+
+<br>
+
+# 1. Documentation
+
+<br>
+
+### Domain knowledge (1.1)
+
+<br>
+
+Citi Bike NYC is a bicycle hire company based in New York City. The bikes can be unlocked through the use of an app, and users are able to purchase yearly memberships or one to three day passes.
+
+The data we are using is a sample including the usage of 10 bikes throughout 2018. It includes each individual trip's start and end times and locations. Customer data is also available, including gender, birth year and bike usage type.
+
+<br>
+
+### Business requirements (1.2)
+
+<br>
+
+I plan to take the following steps to complete this report:
+
+- create a general structure and layout for the report that will act as a skeleton to add content to
+- follow the subsections and complete them in a logical order
+- clean and wrangle the dataset we are working with
+- create visualisations using the cleaned data
+- refine the visualisations to ensure that they all fit within the overall theme of the report
+- refine overall formatting of the report to ensure that the presentation will be appealing and engaging
+
+<br>
+
+### Business processes and data flow (1.3)
+
+<br>
+
+```{r, echo=FALSE, out.width = '100%'}
+knitr::include_graphics(here::here("data/nyc_bikes data flow.png"))
+```
+
+<br>
+
+### Data visualisation as a tool for decision-making (1.4)
+
+<br>
+
+Through the use of analysis and key data visualisations, this report will help NYC Citi Bike decide on potential new marketing strategies as well as infrastructure changes and future expansion.
+
+<br>
+
+### Data types (1.5)
+
+<br>
+
+Prior to any cleaning or wrangling, the dataset contains the following variable types: datetime, double and factor.
+Columns of the following variable types are added through cleaning and wrangling: date and integer.
+
+<br>
+
+### Data quality and data bias (1.6)
+
+<br>
+
+There are some slight concerns with the data.
+
+Quality-wise for example, there are two customers whose dates of birth are listed as 1887 and 1888, which would have made them 130 and 131 years old in 2018. We will be filtering those rows out during analysis.
+
+There are also two instances of customers who appear to have kept their bikes for a period longer than 3 days.
+
+In terms of bias, males are over-represented in the dataset. 930 customers are listed as female and 3069 as male, more than three times as many. There are also 269 customers who are listed as unknown, 243 of which are 49 years old. It is unclear how this might have occurred.
+
+We should also consider the ethical implications of collecting and using customers' data. Whilst the dataset we have used to create this report does not contain any information that could be used to identify individual people by itself, such information is collected during the creation of each customer's Citi Bike account.
+
+<br>
+
+<br>
+
+```{r, echo=FALSE, out.width = '100%'}
+knitr::include_graphics(here::here("data/citibike Low_Res_191105_LYFT_CITIBIKE_4272_RT.webp"))
+```
+
+<br>
+
+<br>
+
+# 2. Data cleaning
+
+<br>
+
+### Preparing data for visualisation (1.7)
+
+<br>
+
+First, all necessary libraries were loaded.
+
+The NYC Citi Bikes dataset was then loaded in and investigated. Total number of NA values across the dataset was checked, which happened to be 0.
+
+The following new columns were created to assist with data visualisation:
+
+- `age`: age of each customer in 2018
+- `date`: date extracted from `start_time` column
+- `day`: day of the week extracted from `start_time` column
+- `month`: month extracted from `start_time` column
+- `quarter`: quarter extracted from `start_time` column
+- `total_time`: the amount of time in minutes that each customer used their bike
+
+<br>
+
+<br>
+
+```{r, include=FALSE}
+library(tidyverse)
+library(lubridate)
+library(tsibbledata)
+library(tsibble)
+library(slider)
+library(leaflet)
+```
+
+```{r, include=FALSE}
+nyc_bikes_df <- nyc_bikes
+
+glimpse(nyc_bikes_df)
+
+sum(is.na(nyc_bikes_df))
+```
+
+```{r, include=FALSE}
+nyc_bikes_df <- nyc_bikes_df %>% 
+  mutate(
+    age = 2018 - birth_year, 
+    date = date(start_time), 
+    day = wday(start_time, label = TRUE, abbr = TRUE), 
+    month = month(start_time, label = TRUE, abbr = TRUE), 
+    quarter = quarter(start_time), 
+    total_time = as.integer(round(as.double(stop_time - start_time)))
+  ) %>% 
+  filter(age < 80)
+```
+
+```{r, echo=FALSE, out.width = '100%'}
+knitr::include_graphics(here::here("data/citibike save-money.webp"))
+```
+
+<br>
+
+<br>
+
+# 3. Data visualisation
+
+<br>
+
+### Process and design (2.1, 2.7, 2.8, 2.9)
+
+<br>
+
+To begin with I looked at the cleaned dataset in the RStudio viewing window and decided which variables might be interesting to plot. I then created many plots of different types, keeping the ones that provided interesting insights and discarding the ones that didn't. I then refined the remaining plots, checked that they accurately convey the selected data, decided on a common theme and ensured that font size and other elements were consistent across all the visualisations. I chose this particular colour scheme as the colours themselves are colourblind safe and tie in with the Citi Bike company logo. All visualisations were made in RStudio using the ggplot and leaflet packages.
+
+<br>
+
+### Visualisations (2.2, 2.3, 2.4, 2.5, 2.6)
+
+<br>
+
+<br>
+
+```{r}
+nyc_bikes_df %>% 
+  index_by(quarter) %>% 
+  ggplot() +
+  aes(x = quarter, fill = gender) +
+  scale_fill_manual(name = "Gender", 
+                    values = c("Female" = "#f46d43", 
+                               "Male" = "#74add1", 
+                               "Unknown" = "#fee090")) +
+  geom_bar() +
+  labs(x = "Quarter",
+       y = "Rental count",
+       title = "Total number of bike rentals by quarter") +
+  theme_light() +
+  theme(title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12), 
+        legend.title = element_text(size = 12), 
+        legend.text = element_text(size = 10))
+```
+
+<br>
+
+This bar plot shows the total number of bike rentals for each quarter in 2018. It is the first visualisation I have chosen to include as it provides a quarterly overview and also shows the proportion of Citi Bike users by gender.
+
+These rental figures can be used to create advertisements during lower traffic periods and also targeting under-represented demographics.
+
+<br>
+
+<br>
+
+```{r}
+nyc_bikes_df %>% 
+  index_by(month) %>% 
+  summarise(count = n()) %>% 
+  ggplot() +
+  aes(x = month, y = count) +
+  geom_col(fill = "#f46d43") +
+  geom_text(aes(label = count), vjust = 2, colour = "white", size = 5) +
+  labs(x = "Month",
+       y = "Rental count",
+       title = "Total number of bike rentals by month") +
+  theme_light() +
+  theme(title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(size = 12))
+```
+
+<br>
+
+This bar plot is closely related to the previous one, and shows the total number of bike rentals for each month in 2018.
+
+It is useful to check at a glance which months are the most popular and which ones could benefit from a special promotion for example.
+
+<br>
+
+<br>
+
+```{r}
+nyc_bikes_df %>% 
+  index_by(day) %>% 
+  summarise(count = n()) %>% 
+  ggplot() +
+  aes(x = day, y = count) +
+  geom_col(fill = "#74add1") +
+  geom_text(aes(label = count), vjust = 2, colour = "white", size = 8) +
+  labs(x = "Day",
+       y = "Rental count",
+       title = "Total number of bike rentals by day of the week") +
+  theme_light() +
+  theme(title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(size = 12))
+```
+
+<br>
+
+This bar plot shows the total number of bike rentals by day of the week for 2018.
+
+We can see that Saturdays and Sundays have the lowest rental numbers, it might be worth investigating further and perhaps creating a marketing campaign targeting weekend users.
+
+<br>
+
+<br>
+
+```{r}
+nyc_bikes_df %>% 
+  index_by(date) %>% 
+  summarise(rental_count = n()) %>% 
+    mutate(
+    rc_moving_avg = slide_dbl(
+      .x = rental_count, 
+      .f = ~ mean(.),
+      .before = 10,
+      .after = 10
+    )
+  ) %>% 
+  ggplot() +
+  geom_line(aes(x = date, y = rental_count), colour = "#74add1") +
+  geom_line(aes(x = date, y = rc_moving_avg), colour = "#f46d43") +
+  labs(y = "Rental count",
+       title = "Daily bike rentals") +
+  theme_light() +
+  theme(title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(size = 12))
+```
+
+<br>
+
+This visualisation consists of two line plots, the blue line showing the number of bike rentals for most days of the year, and the the orange line showing a rolling average to give a clearer picture. Note that none of the days have a rental count of 0, as those days have simply been omitted from the dataset we are using.
+
+This plot can be used by the business to gain a clear understanding of how the daily bike rental count fluctuates during the year, and could be used to forecast future rental numbers as well.
+
+<br>
+
+<br>
+
+```{r}
+nyc_bikes_df %>% 
+  group_by(age) %>% 
+  filter(age < 80) %>% 
+  ggplot() +
+  aes(x = age, fill = gender) +
+  scale_fill_manual(name = "Gender", 
+                    values = c("Female" = "#f46d43", 
+                               "Male" = "#74add1", 
+                               "Unknown" = "#fee090")) +
+  geom_histogram(colour = "white", binwidth = 1) +
+  labs(x = "Age",
+       y = "Rental count",
+       title = "Total number of bike rentals by customer age") +
+  theme_light() +
+  theme(title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12), 
+        legend.title = element_text(size = 12), 
+        legend.text = element_text(size = 10)) +
+  scale_x_continuous(breaks = waiver(), n.breaks = 11)
+```
+
+<br>
+
+This bar plot shows the relationship between the total number of yearly bike rentals and Citi Bike users' age and gender. An important note here is that there appears to be an anomaly in the data for 49 year old users whose gender is listed as unknown. I have decided to keep the data in question rather than editing it out, however it is an element of the visualisation that should be questioned.
+
+This visualisation can be very helpful in allowing the business to conduct further targeted marketing based on user age ranges.
+
+<br>
+
+<br>
+
+```{r}
+nyc_bikes_df %>% 
+  filter(total_time <= 30) %>% 
+  ggplot() +
+  aes(x = total_time) +
+  geom_bar(col = "white", fill = "#f46d43") +
+  labs(x = "Ride duration (minutes)",
+       y = "Rental count",
+       title = "Total number of bike rentals by ride duration") +
+  theme_light() +
+  theme(title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12)) +
+  scale_x_continuous(breaks = waiver(), n.breaks = 7)
+```
+
+<br>
+
+This bar plot provides an overview of the total number of bike rentals by ride duration in minutes. It is important to note that this visualisation includes 96% of the overall data. 87% of users rode their bikes for 15 minutes or less, and only 4% of users chose to ride their bike for longer than 30 minutes. The choice to limit the ride time to 30 minutes here was made to improve the plot's legibility. There were also two instances of users who kept their bikes for over three days, which contributed to the choice of removing outliers from this plot.
+
+This visualisation can help the business decide on a pricing structure based on how long users rent their bikes on average. It can also assist with deciding how many bikes are needed.
+
+<br>
+
+<br>
+
+```{r, message=FALSE}
+nyc_bikes_df %>% 
+  as_tibble() %>% 
+  filter(total_time < 60, gender != "Unknown") %>% 
+  group_by(type, gender) %>% 
+  summarise(tt_mean = mean(total_time)) %>% 
+  ggplot() +
+  aes(x = tt_mean, y = type, fill = gender) +
+  scale_fill_manual(name = "Gender", 
+                    values = c("Female" = "#f46d43", 
+                               "Male" = "#74add1")) +
+  geom_col(position = "dodge") +
+  labs(x = "Ride duration (minutes)",
+       title = "Average ride duration by user type") +
+  theme_light() +
+  theme(title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_blank(), 
+        legend.title = element_text(size = 12), 
+        legend.text = element_text(size = 10)) +
+  scale_x_continuous(breaks = c(0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22))
+  # geom_text(aes(label = floor(tt_mean), vjust = 0))
+```
+
+<br>
+
+This bar plot shows the average ride duration by user type. A customer is a user who has purchased a 24 hour or 3 day pass, whereas subscribers hold year-long subscriptions. We can see that customers tend to ride longer than subscribers, and there is even a non-negligible difference between female and male customers.
+
+This visualisation can assist the business with allocating bikes and also help distinguish between potential commuters and tourists, aiding with marketing strategies.
+
+<br>
+
+<br>
+
+```{r, message=FALSE}
+nyc_bikes_df %>% 
+  as_tibble() %>% 
+  filter(total_time <= 30, gender != "Unknown") %>% 
+  group_by(age, gender) %>% 
+  summarise(tt_mean = mean(total_time)) %>% 
+  filter(tt_mean < 16) %>% 
+  ggplot() +
+  aes(x = age, y = tt_mean, colour = gender) +
+  scale_colour_manual(name = "Gender", 
+                      values = c("Female" = "#f46d43", 
+                               "Male" = "#74add1")) +
+  geom_point() +
+  labs(x = "Age",
+       y = "Average ride time (minutes)",
+       title = "Average ride time by age") +
+  theme_light() +
+  theme(title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12), 
+        legend.title = element_text(size = 12), 
+        legend.text = element_text(size = 10)) +
+  scale_x_continuous(breaks = waiver(), n.breaks = 11) +
+  ylim(0, 14)
+```
+
+<br>
+
+This scatterplot is a representation of average ride time by age and gender. We can see a slight decrease in average ride time as user age goes up.
+
+This visualisation can help the business with bike allocation and perhaps predicting how long users might rent a bike for.
+
+<br>
+
+<br>
+
+```{r}
+nyc_bikes_df %>% 
+  as_tibble() %>% 
+  group_by(start_station) %>% 
+  mutate(trip_count = n()) %>% 
+  distinct(start_station, .keep_all = TRUE) %>% 
+  leaflet() %>% 
+  addProviderTiles(providers$CartoDB.Positron) %>%
+  # addProviderTiles(providers$CartoDB.Voyager) %>%
+  addCircleMarkers(lng = ~start_long, 
+             lat = ~start_lat, 
+             color = "#fdae61", 
+             radius = ~ sqrt(trip_count), 
+             fillOpacity = 0.5,
+             popup = ~paste0("Station number: ", start_station, "<br>", 
+                             "Trips started: ", trip_count))
+```
+
+<br>
+
+This interactive map shows the location of all bike rental stations included in our dataset. The radius of each point indicates the number of trips started at that particular station. Clicking on each station brings up a popup which informs us of the station number and trip count.
+
+The business can use this map to decide how many bikes to allocate to each station based on traffic. It can also be useful to help with expansion decisions, revealing areas which might benefit from further stations for example.
+
+<br>
+
+<br>
+
+```{r, echo=FALSE, out.width = '100%'}
+knitr::include_graphics(here::here("data/citibike 575c51a2dd0895ff718b4a7b.jpeg"))
+```
+
+<br>
+
+<br>
+
+# 4. Main insights
+
+<br>
+
+The first important insight gained from our data visualisations is the fact that the number of bike hires varies a lot throughout the year. Certain seasons, months, days of the week are more popular than others, and all these insights combined will allow the business to make better bike usage predictions as well as create more effective and targeted advertisement campaigns.
+
+A specific recommendation would be to create a seasonal or quarterly pass, with pricing based on the season's popularity amongst bike riders, and also taking into account the price of an annual pass.
+
+A weekend pass could also be created to increase bike hires on weekends, perhaps in collaboration with New York visitor attractions who could provide discounts in exchange for traffic.
+
+Another important insight is that bike hire numbers are dependent on user type, age and gender.
+
+Customers tend to rent bikes for longer periods of time than subscribers, a recommendation here would be to take this difference into account when considering pricing of subscriptions and day passes.
+
+Another recommendation would be to increase awareness of Citi Bike with women, through targeted marketing for example, as they currently make up a low percentage of total users.
+
+User age can be used to further predict ride length and thus the business can predict where and when more bikes might be needed depending on the areas these users live for example.
+
+Finally, the geospatial data provides valuable insights into traffic to and from all the bike stations in the network.
+
+My last recommendation would be to use the map visualisation to determine which areas of the city can be targeted for further expansion through the addition of more bike stations.
+
+<br>
+
+Thank you for reading!
+
+```{r, echo=FALSE, fig.align = 'right', out.width = '25%'}
+knitr::include_graphics(here::here("data/Citi_Bike_logo.jpeg"))
+```
