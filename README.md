@@ -4,6 +4,8 @@
 
 This repository contains an analysis of bike rental data from Citi Bike NYC. The entire report was created in R. This project was undertaken as a part of CodeClan's Professional Data Analysis course.
 
+[View Report](https://mrcslx.github.io/citi_bike_nyc.html)
+
 ## Methodology
 
 Through the use of data wrangling and key data visualisations, the aim of this report is to extract valuable insights from the data and present them in an appealing and informative way.
