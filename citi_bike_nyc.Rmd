@@ -52,6 +52,12 @@ I plan to take the following steps to complete this report:
 - refine the visualisations to ensure that they all fit within the overall theme of the report
 - refine overall formatting of the report to ensure that the presentation will be appealing and engaging
 
+The aim of the report is to assist with answering the following questions:
+
+- do bike hires follow any kind of pattern over time?
+- do bike rider demographics have an impact on bike hire patterns?
+- what potential steps could be taken to improve Citi Bike's business?
+
 <br>
 
 ### Business processes and data flow
@@ -76,8 +82,9 @@ Through the use of analysis and key data visualisations, this report will help C
 
 <br>
 
-Prior to any cleaning or wrangling, the dataset contains the following variable types: datetime, double and factor.
-Columns of the following variable types are added through cleaning and wrangling: date and integer.
+Prior to any cleaning or wrangling, the dataset contains the following variable types: datetime, double (numerical variable which can represent fractional as well as whole values) and factor (used to represent categorical data, either ordered or unordered).
+
+Columns of the following variable types are added through cleaning and wrangling: date and integer (real numbers which do not have fractional values).
 
 <br>
 
